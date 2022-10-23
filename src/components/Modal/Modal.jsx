@@ -1,3 +1,4 @@
+// import PropTypes from 'prop-types';
 import { Component } from 'react';
 import { createPortal } from 'react-dom';
 import { Overlay, ModalBox } from './Modal.styled';
@@ -9,11 +10,18 @@ export default class Modal extends Component {
   };
   componentDidMount() {
     const { allPhotos, shownBigImgId } = this.props;
-    const modalImg = allPhotos.find(
-      ({id}) => id === shownBigImgId);
-      this.setState({ largeImageURL: modalImg.largeImageURL });
-    
+    const modalImg = allPhotos.find(({ id }) => id === shownBigImgId);
+    this.setState({ largeImageURL: modalImg.largeImageURL });
+    window.addEventListener('keydown', this.handleKeyDown);
   }
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.handleKeyDown);
+  }
+  handleKeyDown = e => {
+    if (e.code === 'Escape') {
+      this.props.onClick();
+    }
+  };
   render() {
     return createPortal(
       <Overlay onClick={this.props.onClick}>

@@ -26,6 +26,9 @@ export default class App extends Component {
           this.setState({ isLoading: true });
           const { query, page } = this.state;
           const arrOfPhotos = await fetchPhotos(query, page);
+          if (arrOfPhotos.hits.length === 0) {
+            toast.info('Sorry, we did not find any images:( Try another word')
+          }
           this.setState(({ allPhotos }) => ({
             allPhotos: [...allPhotos, ...arrOfPhotos.hits],
             totalPages: Math.ceil(arrOfPhotos.totalHits / 12),
@@ -75,7 +78,7 @@ export default class App extends Component {
       <>
         <SearchBar
           handleSubmit={this.handleSubmit}
-          isSubmitting={this.state.isLoading}
+          isSubmitting={isLoading}
         />
         {isLoading && <Loading isLoading={isLoading} />}
         {allPhotos.length > 0 && (
