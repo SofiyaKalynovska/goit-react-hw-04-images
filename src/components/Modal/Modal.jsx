@@ -1,4 +1,4 @@
-// import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import { Component } from 'react';
 import { createPortal } from 'react-dom';
 import { Overlay, ModalBox } from './Modal.styled';
@@ -22,14 +22,30 @@ export default class Modal extends Component {
       this.props.onClick();
     }
   };
+  handleBackdropClick = evt => {
+    if (evt.currentTarget === evt.target) {
+      this.props.onClick();
+    }
+  };
   render() {
+    const { largeImageURL } = this.state;
     return createPortal(
-      <Overlay onClick={this.props.onClick}>
+      <Overlay onClick={this.handleBackdropClick}>
         <ModalBox>
-          <img src={this.state.largeImageURL} alt="yoursearch" />
+          <img src={largeImageURL} alt="yoursearch" />
         </ModalBox>
       </Overlay>,
       modalRoot
     );
   }
 }
+
+Modal.propTypes = {
+  allPhotos: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+    })
+  ),
+  onClick: PropTypes.func.isRequired,
+  shownBigImgId: PropTypes.number.isRequired,
+};

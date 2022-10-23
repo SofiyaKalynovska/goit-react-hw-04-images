@@ -6,7 +6,7 @@ import { Loading } from './Loading/Loading';
 import { LoadMoreBtn } from './LoadMore/LoadMore';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import  Modal  from './Modal/Modal';
+import Modal from './Modal/Modal';
 
 export default class App extends Component {
   state = {
@@ -16,38 +16,37 @@ export default class App extends Component {
     totalPages: 0,
     isLoading: false,
     showModal: false,
-    shownBigImgId: ''
+    shownBigImgId: '',
   };
 
   async componentDidUpdate(_, prevState) {
     const { query, page } = this.state;
-      if (query !== prevState.query || page !== prevState.page) {
-        try {
-          this.setState({ isLoading: true });
-          const { query, page } = this.state;
-          const arrOfPhotos = await fetchPhotos(query, page);
-          if (arrOfPhotos.hits.length === 0) {
-            toast.info('Sorry, we did not find any images:( Try another word')
-          }
-          this.setState(({ allPhotos }) => ({
-            allPhotos: [...allPhotos, ...arrOfPhotos.hits],
-            totalPages: Math.ceil(arrOfPhotos.totalHits / 12),
-          }));
-        } catch {
-          toast.error('Something went wrong! Please try again!')
-          
-        } finally {
-          this.setState({ isLoading: false });
+    if (query !== prevState.query || page !== prevState.page) {
+      try {
+        this.setState({ isLoading: true });
+        const { query, page } = this.state;
+        const arrOfPhotos = await fetchPhotos(query, page);
+        if (arrOfPhotos.hits.length === 0) {
+          toast.info('Sorry, we did not find any images:( Try another word');
         }
-      } 
+        this.setState(({ allPhotos }) => ({
+          allPhotos: [...allPhotos, ...arrOfPhotos.hits],
+          totalPages: Math.ceil(arrOfPhotos.totalHits / 12),
+        }));
+      } catch {
+        toast.error('Something went wrong! Please try again!');
+      } finally {
+        this.setState({ isLoading: false });
+      }
+    }
   }
   handleSubmit = e => {
     e.preventDefault();
     const form = e.currentTarget;
     const query = form.elements.search.value;
     if (query === this.state.query.trim()) {
-        toast.error('Please provide new word for search');
-        return;
+      toast.error('Please provide new word for search');
+      return;
     }
     this.setState({
       allPhotos: [],
@@ -64,12 +63,12 @@ export default class App extends Component {
 
   toggleModal = () => {
     this.setState(({ showModal }) => ({
-    showModal: !showModal
-  }))
-  }
-  createModalImgId = (id) => {
+      showModal: !showModal,
+    }));
+  };
+  createModalImgId = id => {
     this.setState({ shownBigImgId: id });
-  }
+  };
 
   render() {
     const { allPhotos, isLoading, totalPages, page, shownBigImgId } =
@@ -78,7 +77,7 @@ export default class App extends Component {
       <>
         <SearchBar
           handleSubmit={this.handleSubmit}
-          isSubmitting={isLoading}
+          isSubmitting={isLoading === true}
         />
         {isLoading && <Loading isLoading={isLoading} />}
         {allPhotos.length > 0 && (
@@ -95,8 +94,8 @@ export default class App extends Component {
           <Modal
             onClick={this.toggleModal}
             allPhotos={allPhotos}
-            shownBigImgId
-            ={shownBigImgId} />
+            shownBigImgId={shownBigImgId}
+          />
         )}
         <ToastContainer />
       </>
