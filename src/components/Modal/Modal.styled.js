@@ -1,5 +1,14 @@
 import styled from 'styled-components'
 
+export const Backdrop = styled.div` 
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-gap: 16px;
+  text-align: center;
+  padding-bottom: 24px;
+
+`
+
 export const Overlay = styled.div`
   position: fixed;
   top: 0;
@@ -12,7 +21,7 @@ export const Overlay = styled.div`
   background-color: rgba(0, 0, 0, 0.8);
   z-index: 1200;
 `
-export const Modal = styled.div`
+export const ModalBox = styled.div`
   max-width: calc(100vw - 48px);
   max-height: calc(100vh - 24px);
 `

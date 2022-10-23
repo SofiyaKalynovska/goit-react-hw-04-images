@@ -6,6 +6,7 @@ import { Loading } from './Loading/Loading';
 import { LoadMoreBtn } from './LoadMore/LoadMore';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import  Modal  from './Modal/Modal';
 
 export default class App extends Component {
   state = {
@@ -14,6 +15,8 @@ export default class App extends Component {
     page: 1,
     totalPages: 0,
     isLoading: false,
+    showModal: false,
+    shownBigImgId: ''
   };
 
   async componentDidUpdate(_, prevState) {
@@ -56,8 +59,18 @@ export default class App extends Component {
     }));
   };
 
+  toggleModal = () => {
+    this.setState(({ showModal }) => ({
+    showModal: !showModal
+  }))
+  }
+  createModalImgId = (id) => {
+    this.setState({ shownBigImgId: id });
+  }
+
   render() {
-    const { allPhotos, isLoading, totalPages, page } = this.state;
+    const { allPhotos, isLoading, totalPages, page, shownBigImgId } =
+      this.state;
     return (
       <>
         <SearchBar
@@ -65,11 +78,23 @@ export default class App extends Component {
           isSubmitting={this.state.isLoading}
         />
         {isLoading && <Loading isLoading={isLoading} />}
-        {allPhotos.length > 0 && <ImageGallery allPhotos={allPhotos} />}
-        {totalPages > 1 &&
-          (page < totalPages) && !isLoading &&(
-            <LoadMoreBtn onClick={this.loadMore}/>
-          )}
+        {allPhotos.length > 0 && (
+          <ImageGallery
+            allPhotos={allPhotos}
+            onClick={this.toggleModal}
+            createModalImgId={this.createModalImgId}
+          />
+        )}
+        {totalPages > 1 && page < totalPages && !isLoading && (
+          <LoadMoreBtn onClick={this.loadMore} />
+        )}
+        {this.state.showModal && (
+          <Modal
+            onClick={this.toggleModal}
+            allPhotos={allPhotos}
+            shownBigImgId
+            ={shownBigImgId} />
+        )}
         <ToastContainer />
       </>
     );
