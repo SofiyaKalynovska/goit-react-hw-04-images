@@ -6,12 +6,14 @@ import {
   SearchFormBtnLabel,
   SearchFormInput,
 } from './Searchbar.styled';
+import { ReactComponent as SearchIcon } from '../../icons/SearchIcon.svg';
 
 export const SearchBar = ({ handleSubmit, isSubmitting }) => {
   return(
   <Searchbar>
     <SearchForm onSubmit={handleSubmit} isSubmitting={isSubmitting}>
-      <SearchFormBtn type="submit">
+        <SearchFormBtn type="submit">
+          <SearchIcon />
         <SearchFormBtnLabel>Search</SearchFormBtnLabel>
       </SearchFormBtn>
       <SearchFormInput

@@ -1,7 +1,11 @@
-import { LoadBtn } from "./LoadMore.styled"
+import {LoadBtn } from "./LoadMore.styled"
 
 export const LoadMoreBtn = ({onClick, isSubmitting}) => {
   return (
-    <LoadBtn type='button' onClick={onClick} disabled={isSubmitting} />
-  )
+   
+      <LoadBtn type="button" onClick={onClick} disabled={isSubmitting}>
+        Load more
+      </LoadBtn>
+   
+  );
 }
