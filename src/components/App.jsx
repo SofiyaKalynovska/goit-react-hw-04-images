@@ -3,7 +3,7 @@ import { ImageGallery } from './ImageGallery/ImageGallery';
 import { SearchBar } from './Searchbar/Searchbar';
 import { fetchPhotos } from '../api';
 import { Loading } from './Loading/Loading';
-import { LoadMoreBtn } from './LoadMore/LoadMore';
+import { LoadMoreBtn } from './App.styled';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Modal from './Modal/Modal';
@@ -88,9 +88,11 @@ export default class App extends Component {
           />
         )}
         {isLoading && <Loading isLoading={isLoading} />}
-        {totalPages > 1 &&
-          page < totalPages &&
-          !isLoading && (<LoadMoreBtn onClick={this.loadMore} />)}
+        {totalPages > 1 && page < totalPages && !isLoading && (
+          <LoadMoreBtn type="button" onClick={this.loadMore}>
+            Load more
+          </LoadMoreBtn>
+        )}
         {this.state.showModal && (
           <Modal
             onClick={this.toggleModal}

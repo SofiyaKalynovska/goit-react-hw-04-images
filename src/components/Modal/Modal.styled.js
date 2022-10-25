@@ -1,14 +1,5 @@
 import styled from 'styled-components'
 
-export const Backdrop = styled.div` 
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-gap: 16px;
-  text-align: center;
-  padding-bottom: 24px;
-
-`
-
 export const Overlay = styled.div`
   position: fixed;
   top: 0;
