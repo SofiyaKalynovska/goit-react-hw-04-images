@@ -79,7 +79,7 @@ export default class App extends Component {
           handleSubmit={this.handleSubmit}
           isSubmitting={isLoading === true}
         />
-        {isLoading && <Loading isLoading={isLoading} />}
+
         {allPhotos.length > 0 && (
           <ImageGallery
             allPhotos={allPhotos}
@@ -87,9 +87,10 @@ export default class App extends Component {
             createModalImgId={this.createModalImgId}
           />
         )}
-        {totalPages > 1 && page < totalPages && !isLoading && (
-          <LoadMoreBtn onClick={this.loadMore} />
-        )}
+        {isLoading && <Loading isLoading={isLoading} />}
+        {totalPages > 1 &&
+          page < totalPages &&
+          !isLoading && (<LoadMoreBtn onClick={this.loadMore} />)}
         {this.state.showModal && (
           <Modal
             onClick={this.toggleModal}
