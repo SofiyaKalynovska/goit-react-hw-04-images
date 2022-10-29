@@ -1,43 +1,42 @@
 import PropTypes from 'prop-types';
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Overlay, ModalBox } from './Modal.styled';
 
 const modalRoot = document.querySelector('#modal-root');
-export default class Modal extends Component {
-  state = {
-    largeImageURL: '',
-  };
-  componentDidMount() {
-    const { allPhotos, shownBigImgId } = this.props;
+
+export default function Modal({allPhotos, shownBigImgId, onClick}) {
+    const [largeImageURL, setLargeImageURL] = useState('')
+  
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    }
+  })
+  useEffect(() => {
     const modalImg = allPhotos.find(({ id }) => id === shownBigImgId);
-    this.setState({ largeImageURL: modalImg.largeImageURL });
-    window.addEventListener('keydown', this.handleKeyDown);
-  }
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.handleKeyDown);
-  }
-  handleKeyDown = e => {
+    setLargeImageURL(modalImg.largeImageURL);
+  }, [allPhotos, shownBigImgId]);
+  
+  const handleKeyDown = e => {
     if (e.code === 'Escape') {
-      this.props.onClick();
+      onClick();
     }
   };
-  handleBackdropClick = evt => {
+  const handleBackdropClick = evt => {
     if (evt.currentTarget === evt.target) {
-      this.props.onClick();
+      onClick();
     }
   };
-  render() {
-    const { largeImageURL } = this.state;
     return createPortal(
-      <Overlay onClick={this.handleBackdropClick}>
+      <Overlay onClick={handleBackdropClick}>
         <ModalBox>
           <img src={largeImageURL} alt="yoursearch" />
         </ModalBox>
       </Overlay>,
       modalRoot
     );
-  }
 }
 
 Modal.propTypes = {
