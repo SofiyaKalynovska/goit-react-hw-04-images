@@ -9,7 +9,7 @@ export const ImageGallery = ({ allPhotos, onClick, createModalImgId }) => {
       {allPhotos.map(({ id, webformatURL, tags }) => (
         <ImageGalleryItem
           key={id}
-          url={webformatURL}
+          url={webformatURL} 
           id={id}
           title={tags}
           onOpen={onClick}

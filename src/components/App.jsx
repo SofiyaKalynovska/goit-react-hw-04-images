@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { SearchBar } from './Searchbar/Searchbar';
 import { fetchPhotos } from '../api';
@@ -8,147 +8,100 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Modal from './Modal/Modal';
 
-export default class App extends Component {
-  state = {
-    allPhotos: [],
-    query: '',
-    page: 1,
-    totalPages: 0,
-    isLoading: false,
-    showModal: false,
-    shownBigImgId: '',
-  };
+export default function App() {
+  const [allPhotos, setAllPhotos] = useState([]);
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [shownBigImgId, setShownBigImgId] = useState('');
 
-  async componentDidUpdate(_, prevState) {
-    const { query, page } = this.state;
-    if (query !== prevState.query || page !== prevState.page) {
+  useEffect(() => {
+    const controller = new AbortController();
+    async function getPhotos() {
       try {
-        this.setState({ isLoading: true });
-        const { query, page } = this.state;
-        const arrOfPhotos = await fetchPhotos(query, page);
-        if (arrOfPhotos.hits.length === 0) {
+        setIsLoading(true);
+
+        const arrOfPhotos = await fetchPhotos(query, page, {
+          signal: controller.signal,
+        });
+
+        if (arrOfPhotos.length === 0) {
           toast.info('Sorry, we did not find any images:( Try another word');
+          return;
         }
-        this.setState(({ allPhotos }) => ({
-          allPhotos: [...allPhotos, ...arrOfPhotos.hits],
-          totalPages: Math.ceil(arrOfPhotos.totalHits / 12),
-        }));
-      } catch {
+        setAllPhotos([...allPhotos, ...arrOfPhotos.hits]);
+        setTotalPages(Math.ceil(arrOfPhotos.totalHits / 12));
+      } catch (error) {
+        console.log(error);
         toast.error('Something went wrong! Please try again!');
       } finally {
-        this.setState({ isLoading: false });
+        setIsLoading(false);
       }
     }
-  }
-  handleSubmit = e => {
+    if (query.trim() === '') {
+      return;
+    }
+    getPhotos();
+
+    return () => {
+      controller.abort();
+      getPhotos();
+    };
+  }, [query, page]);
+
+  const handleSubmit = e => {
     e.preventDefault();
     const form = e.currentTarget;
-    const query = form.elements.search.value;
-    if (query === this.state.query.trim()) {
+    const newQuery = form.elements.search.value;
+    if (query === newQuery.trim() || newQuery === '') {
       toast.error('Please provide new word for search');
       return;
     }
-    this.setState({
-      allPhotos: [],
-      query: query,
-      page: 1,
-    });
+    setAllPhotos([]);
+    setQuery(newQuery);
+    setPage(1);
     e.target.reset();
   };
-  loadMore = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
+  const loadMore = () => {
+    setPage(page + 1);
   };
 
-  toggleModal = () => {
-    this.setState(({ showModal }) => ({
-      showModal: !showModal,
-    }));
+  const toggleModal = () => {
+    setShowModal(showModal => !showModal);
   };
-  createModalImgId = id => {
-    this.setState({ shownBigImgId: id });
+  const createModalImgId = id => {
+    setShownBigImgId(id);
   };
+  return (
+    <>
+      <SearchBar
+        handleSubmit={handleSubmit}
+        isSubmitting={isLoading === true}
+      />
 
-  render() {
-    const { allPhotos, isLoading, totalPages, page, shownBigImgId } =
-      this.state;
-    return (
-      <>
-        <SearchBar
-          handleSubmit={this.handleSubmit}
-          isSubmitting={isLoading === true}
+      {allPhotos.length > 0 && (
+        <ImageGallery
+          allPhotos={allPhotos}
+          onClick={toggleModal}
+          createModalImgId={createModalImgId}
         />
-
-        {allPhotos.length > 0 && (
-          <ImageGallery
-            allPhotos={allPhotos}
-            onClick={this.toggleModal}
-            createModalImgId={this.createModalImgId}
-          />
-        )}
-        {isLoading && <Loading isLoading={isLoading} />}
-        {totalPages > 1 && page < totalPages && !isLoading && (
-          <LoadMoreBtn type="button" onClick={this.loadMore}>
-            Load more
-          </LoadMoreBtn>
-        )}
-        {this.state.showModal && (
-          <Modal
-            onClick={this.toggleModal}
-            allPhotos={allPhotos}
-            shownBigImgId={shownBigImgId}
-          />
-        )}
-        <ToastContainer />
-      </>
-    );
-  }
+      )}
+      {isLoading && <Loading isLoading={isLoading} />}
+      {totalPages > 1 && page < totalPages && !isLoading && (
+        <LoadMoreBtn type="button" onClick={loadMore}>
+          Load more
+        </LoadMoreBtn>
+      )}
+      {showModal && (
+        <Modal
+          onClick={toggleModal}
+          allPhotos={allPhotos}
+          shownBigImgId={shownBigImgId}
+        />
+      )}
+      <ToastContainer />
+    </>
+  );
 }
-
-// const modalRoot = document.querySelector('#modal-root');
-// export default class Modal extends Component {
-//   state = {
-//     largeImageURL: '',
-//   };
-//   componentDidMount() {
-//     const { allPhotos, shownBigImgId } = this.props;
-//     const modalImg = allPhotos.find(({ id }) => id === shownBigImgId);
-//     this.setState({ largeImageURL: modalImg.largeImageURL });
-//     window.addEventListener('keydown', this.handleKeyDown);
-//   }
-//   componentWillUnmount() {
-//     window.removeEventListener('keydown', this.handleKeyDown);
-//   }
-//   handleKeyDown = e => {
-//     if (e.code === 'Escape') {
-//       this.props.onClick();
-//     }
-//   };
-//   handleBackdropClick = evt => {
-//     if (evt.currentTarget === evt.target) {
-//       this.props.onClick();
-//     }
-//   };
-//   render() {
-//     const { largeImageURL } = this.state;
-//     return createPortal(
-//       <Overlay onClick={this.handleBackdropClick}>
-//         <ModalBox>
-//           <img src={largeImageURL} alt="yoursearch" />
-//         </ModalBox>
-//       </Overlay>,
-//       modalRoot
-//     );
-//   }
-// }
-
-// Modal.propTypes = {
-//   allPhotos: PropTypes.arrayOf(
-//     PropTypes.shape({
-//       id: PropTypes.number.isRequired,
-//     })
-//   ),
-//   onClick: PropTypes.func.isRequired,
-//   shownBigImgId: PropTypes.number.isRequired,
-// };

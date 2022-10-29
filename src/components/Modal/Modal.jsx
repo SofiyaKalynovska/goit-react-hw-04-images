@@ -5,20 +5,20 @@ import { Overlay, ModalBox } from './Modal.styled';
 
 const modalRoot = document.querySelector('#modal-root');
 
-export default function Modal({allPhotos, shownBigImgId, onClick}) {
-    const [largeImageURL, setLargeImageURL] = useState('')
-  
+export default function Modal({ allPhotos, shownBigImgId, onClick }) {
+  const [largeImageURL, setLargeImageURL] = useState('');
+
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
-    }
-  })
+    };
+  });
   useEffect(() => {
     const modalImg = allPhotos.find(({ id }) => id === shownBigImgId);
     setLargeImageURL(modalImg.largeImageURL);
   }, [allPhotos, shownBigImgId]);
-  
+
   const handleKeyDown = e => {
     if (e.code === 'Escape') {
       onClick();
@@ -29,14 +29,14 @@ export default function Modal({allPhotos, shownBigImgId, onClick}) {
       onClick();
     }
   };
-    return createPortal(
-      <Overlay onClick={handleBackdropClick}>
-        <ModalBox>
-          <img src={largeImageURL} alt="yoursearch" />
-        </ModalBox>
-      </Overlay>,
-      modalRoot
-    );
+  return createPortal(
+    <Overlay onClick={handleBackdropClick}>
+      <ModalBox>
+        <img src={largeImageURL} alt="yoursearch" />
+      </ModalBox>
+    </Overlay>,
+    modalRoot
+  );
 }
 
 Modal.propTypes = {
