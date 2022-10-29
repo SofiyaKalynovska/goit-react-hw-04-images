@@ -31,7 +31,7 @@ export default function App() {
           toast.info('Sorry, we did not find any images:( Try another word');
           return;
         }
-        setAllPhotos([...allPhotos, ...arrOfPhotos.hits]);
+        setAllPhotos(prevState => [...prevState, ...arrOfPhotos.hits]);
         setTotalPages(Math.ceil(arrOfPhotos.totalHits / 12));
       } catch (error) {
         console.log(error);
@@ -47,11 +47,11 @@ export default function App() {
 
     return () => {
       controller.abort();
-      getPhotos();
     };
   }, [query, page]);
 
-  const handleSubmit = e => {
+  const handleSubmitSearchBar = e => {
+    console.log('handlesubmit')
     e.preventDefault();
     const form = e.currentTarget;
     const newQuery = form.elements.search.value;
@@ -65,7 +65,7 @@ export default function App() {
     e.target.reset();
   };
   const loadMore = () => {
-    setPage(page + 1);
+    setPage(prevState => prevState + 1);
   };
 
   const toggleModal = () => {
@@ -77,7 +77,7 @@ export default function App() {
   return (
     <>
       <SearchBar
-        handleSubmit={handleSubmit}
+        handleSubmit={handleSubmitSearchBar}
         isSubmitting={isLoading === true}
       />
 
