@@ -51,7 +51,6 @@ export default function App() {
   }, [query, page]);
 
   const handleSubmitSearchBar = e => {
-    console.log('handlesubmit')
     e.preventDefault();
     const form = e.currentTarget;
     const newQuery = form.elements.search.value;
